@@ -16,7 +16,7 @@ public:
 
 class Solution {
 public:
-
+/*
     // int getIndexOfNode(Node* head, Node* random) {
     //     int cnt = 0;
     //     while(head) {
@@ -79,7 +79,7 @@ public:
 
         Node* curr = head;
         while(curr) {
-            if(curr->random && !curr->next->random) {
+            if(curr->random) {
                 curr->next->random = curr->random ? curr->random->next : nullptr;
             }
             curr = curr->next->next;
@@ -98,6 +98,44 @@ public:
         return cloneHead;
 
         
+    }
+
+*/
+
+    Node* copyRandomList(Node* head)  {
+        if(!head) return nullptr;
+
+        Node* mover = head;
+
+        while(mover) {
+            Node* next = mover->next; 
+            Node* copied = new Node(mover->val);
+            mover->next = copied;
+            copied->next = next;
+            mover = next;
+        }
+
+        mover = head;
+
+        while(mover) {
+            if(mover->random) {
+                mover->next->random = mover->random->next;
+            }
+            mover = mover->next->next;
+        }
+
+        Node* original = head;
+        Node* copiedHead = head->next;
+
+        while(original) {
+            Node* clone = original->next;
+            original->next = clone->next;
+            if(clone->next)clone->next = clone->next->next;
+            original = original->next; 
+        }
+
+        return copiedHead;
+
     }
 
 };
