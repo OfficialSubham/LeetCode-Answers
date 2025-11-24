@@ -1,5 +1,6 @@
 class Solution {
 public:
+/*
     // int myAtoi(string s) {
     //     long long ans = 0;
     //     int n = s.size();
@@ -74,6 +75,27 @@ public:
             i++;
         }
         long long ans = parse(s, i, 0);
+        if(ans > INT_MAX) return isNegative ? INT_MIN : INT_MAX;
+        return isNegative ? -ans : ans;
+    }
+*/
+    long long findAns(string s, int i, long long curr) {
+        if(i >= s.size() || !isdigit(s[i])) return curr;
+        int digit = s[i] - '0';
+        if(curr > (INT_MAX - digit)) return (long long)INT_MAX + 1;
+        long long nextVal = curr * 10 + digit;
+        return findAns(s, i + 1, nextVal);
+    }
+
+    int myAtoi(string s) {
+        int i = 0;
+        bool isNegative = false;
+        while(s[i] == ' ') i++;
+        if(s[i] == '+' || s[i] == '-') {
+            if(s[i] == '-') isNegative = true;
+            i++;
+        }
+        long long ans = findAns(s, i, 0);
         if(ans > INT_MAX) return isNegative ? INT_MIN : INT_MAX;
         return isNegative ? -ans : ans;
     }
