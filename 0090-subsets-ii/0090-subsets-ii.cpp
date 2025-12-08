@@ -1,24 +1,22 @@
 class Solution {
 public:
+    //29/11/25
 
-    void findSubset(vector<int> &nums, set<vector<int>> &ansSet, int idx, vector<int> &eachSubset) {
-        ansSet.insert(eachSubset);
+    void findSubset(vector<int> &nums, int idx, vector<vector<int>> &ans, vector<int> &eachSubset) {
+        ans.push_back(eachSubset);
         for(int i = idx; i < nums.size(); i++) {
+            if(i > idx && nums[i] == nums[i - 1]) continue;
             eachSubset.push_back(nums[i]);
-            findSubset(nums, ansSet, i + 1, eachSubset);
+            findSubset(nums, i + 1, ans, eachSubset);
             eachSubset.pop_back();
         }
     }
 
     vector<vector<int>> subsetsWithDup(vector<int>& nums) {
-        set<vector<int>> ansSet;
-        vector<int> temp;
         vector<vector<int>> ans;
+        vector<int> eachSubset;
         sort(nums.begin(), nums.end());
-        findSubset(nums, ansSet, 0, temp);
-        for(auto it : ansSet) {
-            ans.push_back(it);
-        }
+        findSubset(nums, 0, ans, eachSubset);
         return ans;
     }
 };
