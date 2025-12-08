@@ -1,7 +1,8 @@
 class Solution {
 public:
+    //29/11/25
     void findCombination(vector<vector<int>> &ans, vector<int> &eachCombo, int idx, int k, int n, int sum) {
-        if(eachCombo.size() > k || sum > n || idx > 9) return;
+        if(sum > n || idx > 10) return;
         if(eachCombo.size() == k) {
             if(sum == n) ans.push_back(eachCombo);
             return;
