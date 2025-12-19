@@ -10,22 +10,20 @@ public:
         }
     }
 
-    void generateUsingBits(vector<int> &arr, vector<vector<int>> &ans) {
-        int n = 1 << arr.size();
+    void generateUsingBits(vector<int> &nums, vector<vector<int>> &ans) {
+        int n = 1 << nums.size();
         for(int i = 0; i < n; i++) {
-            vector<int> temp;
-            for(int j = 0; j < arr.size(); j++) {
-                if((i >> j )&1) temp.push_back(arr[j]);
+            vector<int> eachAns;
+            for(int j = 0; j < nums.size(); j++) {
+                if((i >> j) & 1) eachAns.push_back(nums[j]);
             }
-            ans.push_back(temp);
+            ans.push_back(eachAns);
         }
     }
-
+    
     vector<vector<int>> subsets(vector<int>& nums) {
         int n = nums.size();
         vector<vector<int>> everySubset;
-        // vector<int> temp;
-        // generate(0, nums, temp, everySubset);
         generateUsingBits(nums, everySubset);
         return everySubset;
     }
