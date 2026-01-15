@@ -1,19 +1,27 @@
+#include<bits/stdc++.h>
+
 class StockSpanner {
 private:
-    vector<int> arr;
+    stack<pair<int, int>> hashStack;
 public:
     StockSpanner() {
     
     }
     
     int next(int price) {
-        this->arr.push_back(price);
-        int span = 0;
-        for(int i = 0; i < arr.size(); i++) {
-            if(arr[i] > price) span = 0;
-            else span++;
+        if(this->hashStack.empty() || this->hashStack.top().first > price) {
+            this->hashStack.push({price, 1});
+            return 1;
         }
-        return span;
+        else {
+            int span = 1;
+            while(!this->hashStack.empty() && this->hashStack.top().first <= price) {
+                span += this->hashStack.top().second;
+                this->hashStack.pop();
+            }
+            this->hashStack.push({price, span});
+            return span;
+        }
     }
 };
 
