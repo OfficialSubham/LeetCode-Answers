@@ -1,19 +1,25 @@
 class DLL {
     public:
-    int key, value;
-    DLL* next;
-    DLL* prev;
+        int value, key;
+        DLL* prev;
+        DLL* next;
 
-    DLL(int k, int v): key(k), value(v), next(nullptr), prev(nullptr) {} 
+    DLL(int v, int k): value(v), key(k), prev(nullptr), next(nullptr) {}
+
 };
 
-
 class LRUCache {
-private:
+public:
+
     DLL* head;
-    DLL* mover;
-    unordered_map<int, DLL*> hashMap;
+    DLL* tail;
     int capacity;
+    unordered_map<int, DLL*> hashMap;
+
+    LRUCache(int c) {
+        this->capacity = c;
+        this->head = this->tail = nullptr;
+    }
 
     void remove(DLL* node) {
         if(node->prev) {
@@ -24,53 +30,48 @@ private:
         if(node->next) {
             node->next->prev = node->prev;
         }
-        else this->mover = node->prev;
+        else this->tail = node->prev;
     }
 
-    void addItToTail(DLL* node) {
+    void addToTail(DLL* node) {
         node->next = nullptr;
-        if(this->mover) { 
-            node->prev = this->mover;
-            this->mover->next = node;
-        }
+        if(this->tail) {
+            node->prev = this->tail;
+            this->tail->next = node;
+        }        
         else {
             this->head = node;
         }
-        this->mover = node;
-    }
-
-public:
-    LRUCache(int cap) {
-        this->capacity = cap;
-        this->head = this->mover = nullptr;
+        this->tail = node;
     }
     
     int get(int key) {
         if(hashMap.count(key)) {
-            int value = hashMap[key]->value;
-            remove(hashMap[key]);
-            addItToTail(hashMap[key]);
-            return value;
+            DLL* node = hashMap[key];
+            remove(node);
+            addToTail(node);
+            return node->value;
         }
-        else return -1;
+        return -1;
     }
     
     void put(int key, int value) {
         if(hashMap.count(key)) {
-            hashMap[key]->value = value;
-            remove(hashMap[key]);
-            addItToTail(hashMap[key]);
+            DLL* node = hashMap[key];
+            node->value = value;
+            remove(node);
+            addToTail(node);
         }
         else {
-            if(hashMap.size() == this->capacity) {
+            if(hashMap.size() == capacity) {
                 DLL* old = head;
-                remove(head);
+                remove(old);
                 hashMap.erase(old->key);
                 delete old;
             }
-            DLL* newPair = new DLL(key, value);
-            addItToTail(newPair);
-            hashMap[key] = newPair;
+            DLL* node = new DLL(value, key);
+            addToTail(node);
+            hashMap[key] = node;
         }
     }
 };
