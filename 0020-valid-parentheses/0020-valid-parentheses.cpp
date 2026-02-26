@@ -1,21 +1,27 @@
+#include<bits/stdc++.h>
 class Solution {
 public:
     bool isValid(string s) {
-        stack<char> hashStack;
-        map<char, char> hashMap;
+
+        if(s.size()%2 == 1) return false;
+
+        stack<char> st;
+        unordered_map<char, char> hashMap;
         hashMap['('] = ')';
         hashMap['{'] = '}';
         hashMap['['] = ']';
+
         for(int i = 0; i < s.size(); i++) {
-            if(s[i] == '(' || s[i] == '{' || s[i] == '[') hashStack.push(s[i]);
+            if(hashMap.count(s[i])) {
+                st.push(s[i]);
+            }
             else {
-                if(hashStack.empty()) return false;
-                char lastParenthese = hashStack.top();
-                hashStack.pop();
-                if(hashMap[lastParenthese] != s[i]) return false;
+                if(!st.size() || hashMap[st.top()] != s[i]) return false;
+                st.pop();
             }
         }
-        if(hashStack.size() > 0) return false;
+        if(st.size()) return false;
+
         return true;
     }
 };
