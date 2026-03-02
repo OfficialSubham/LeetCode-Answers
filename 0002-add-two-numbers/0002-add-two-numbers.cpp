@@ -10,156 +10,67 @@
  */
 class Solution {
 public:
-
-/*
-
-    // ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-    //     int sum = 0;
-    //     ListNode dummy(0);
-    //     ListNode* tail = &dummy;
-
-    //     ListNode* mover1 = l1; 
-    //     ListNode* mover2 = l2;
-
-    //     while(mover1 && mover2) {
-    //         sum += mover1->val + mover2->val;
-    //         if(sum >= 10) {
-    //             int rem = sum%10;
-    //             ListNode* temp = new ListNode(rem);
-    //             tail->next = temp;
-    //             tail = tail->next;
-    //             sum /= 10;
-    //         }
-    //         else {
-    //             ListNode* temp = new ListNode(sum);
-    //             tail->next = temp;
-    //             tail = tail->next;
-    //             sum /= 10;
-    //         }
-    //         mover1 = mover1->next;
-    //         mover2 = mover2->next;
-    //     }
-
-    //     if(mover1) {
-    //         while(sum > 0) {
-    //             if(mover1) sum += mover1->val;
-    //             if(sum >= 10) {
-    //                 int rem = sum%10;
-    //                 ListNode* temp = new ListNode(rem);
-    //                 tail->next = temp;
-    //                 tail = tail->next;
-    //                 sum /= 10;
-    //             }
-    //             else {
-    //                 ListNode* temp = new ListNode(sum);
-    //                 tail->next = temp;
-    //                 tail = tail->next;
-    //                 sum /= 10;
-    //             }
-    //             if(mover1) mover1 = mover1->next;
-    //         }
-    //         tail->next = mover1;
-    //     }
-    //     else if(mover2) {
-    //         while(sum > 0) {
-    //             if(mover2) sum += mover2->val;
-    //             if(sum >= 10) {
-    //                 int rem = sum%10;
-    //                 ListNode* temp = new ListNode(rem);
-    //                 tail->next = temp;
-    //                 tail = tail->next;
-    //                 sum /= 10;
-    //             }
-    //             else {
-    //                 ListNode* temp = new ListNode(sum);
-    //                 tail->next = temp;
-    //                 tail = tail->next;
-    //                 sum /= 10;
-    //             }
-    //             if(mover2) mover2 = mover2->next;
-    //         }
-    //         tail->next = mover2;
-    //     }
-    //     else if(sum > 0) {
-    //          while(sum > 0) {
-    //             if(sum >= 10) {
-    //                 int rem = sum%10;
-    //                 ListNode* temp = new ListNode(rem);
-    //                 tail->next = temp;
-    //                 tail = tail->next;
-    //                 sum /= 10;
-    //             }
-    //             else {
-    //                 ListNode* temp = new ListNode(sum);
-    //                 tail->next = temp;
-    //                 tail = tail->next;
-    //                 sum /= 10;
-    //             }
-    //         }
-    //     }
-    //     return dummy.next;
-    // }
-
-    // ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-    //     int sum = 0;
-    //     ListNode dummy(0);
-    //     ListNode* tail = &dummy;
-    //     ListNode* mover1 = l1;
-    //     ListNode* mover2 = l2;
-    //     while(mover1 || mover2 || sum > 0) {
-    //         if(mover1) sum += mover1->val;
-    //         if(mover2) sum += mover2->val;
-    //         int value = sum % 10;
-    //         ListNode* temp = new ListNode(value);
-    //         tail->next = temp;
-    //         tail = temp;
-    //         sum /= 10;
-    //         if(mover1) mover1 = mover1->next;
-    //         if(mover2) mover2 = mover2->next;
-    //     }
-    //     return dummy.next;
-    // }
-
-*/
-
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        int len1 = 0;
+        int len2 = 0;
+
+        ListNode* m1 = l1;
+        ListNode* m2 = l2;
+
+        while(m1) {
+            len1++;
+            m1 = m1->next;
+        }
+
+        while(m2) {
+            len2++;
+            m2 = m2->next;
+        }
         int carry = 0;
-        ListNode* mover1 = l1;
-        ListNode* mover2 = l2;
-        ListNode dummy(0);
-        ListNode* tail = &dummy;
+    
+        m1 = l1;
+        m2 = l2;
+    
+        if(len1 <= len2) {
+            while(m1) {
+                int sum = m1->val + m2->val + carry;
+                carry = sum/10;
+                m2->val = sum%10;
+                m1 = m1->next;
+                m2 = m2->next;
+            }
+            while(m2 && carry) {
+                int sum = m2->val + carry;
+                carry = sum /10;
+                m2->val = sum % 10;
+                m2 = m2->next;
+            }
+        }
+        else {
+            while(m2) {
+                int sum = m1->val + m2->val + carry;
+                carry = sum/10;
+                m1->val = sum%10;
+                m1 = m1->next;
+                m2 = m2->next;
+            }
+            while(m1 && carry) {
+                int sum = m1->val + carry;
+                carry = sum /10;
+                m1->val = sum % 10;
+                m1 = m1->next;
+            }
+        }
 
-        while(mover1 && mover2) {
-            int sum = (mover1->val + mover2->val + carry);
-            mover1->val = (sum % 10);
-            carry = sum / 10;
-            tail->next = mover1;
-            tail = tail->next;
-            mover1 = mover1->next;
-            mover2 = mover2->next;
-        }
-        while(mover1) {
-            int sum = mover1->val + carry;
-            mover1->val = sum % 10;
-            carry = sum /10;
-            tail->next = mover1;
-            tail = tail->next;
-            mover1 = mover1->next;
-        }
-
-        while(mover2) {
-            int sum = mover2->val + carry;
-            mover2->val = sum % 10;
-            carry = sum /10;
-            tail->next = mover2;
-            tail = tail->next;
-            mover2 = mover2->next;    
-        }
         if(carry) {
             ListNode* temp = new ListNode(carry);
-            tail->next = temp;
+            ListNode* mover;
+            if(len1 <= len2) mover = l2;
+            else mover = l1;
+            while(mover->next) mover = mover->next;
+            mover->next = temp;
         }
-        return dummy.next;
-    } 
-
+        if(len1 <= len2) return l2;
+        return l1;
+    }
 };
