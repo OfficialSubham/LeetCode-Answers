@@ -10,33 +10,33 @@
  */
 class Solution {
 public:
+
     ListNode* rotateRight(ListNode* head, int k) {
-        if(!head || !head->next || k == 0) return head;
-
-        int len = 0;
+        if(!head || !head->next) return head;
+        int leng = 0;
         ListNode* mover = head;
-        ListNode* tail = nullptr;
         while(mover) {
-            len++;
-            if(!mover->next) tail = mover;
+            leng++;
             mover = mover->next;
         }
-        k %= len;
+        k %= leng;
         if(k == 0) return head;
-        //Made a circle linkedList
-        tail->next = head;
-
+        
+        int iteration = leng - k - 1;
         mover = head;
-        int cut = len - k;
-        while(cut--) {
-            if(cut == 0) {
-                head = mover->next;
-                mover->next = nullptr;
-                break;
-            }
-            mover = mover->next;
-        }
-        return head;
-    }
 
+        while(mover && iteration--) mover = mover->next;
+
+        ListNode* newHead = mover->next;
+        mover->next = nullptr;
+
+        ListNode* tail = newHead;
+
+        while(tail->next) tail = tail->next;
+
+        if(tail != newHead) tail->next = head;
+        else newHead->next = head;
+
+        return newHead;
+    }
 };
