@@ -1,27 +1,33 @@
 class DLL {
     public:
-    int value, freq, key;
+    int key, value, freq;
     DLL* next;
     DLL* prev;
-
-    DLL(int v, int k):  value(v), freq(1), key(k), next(nullptr), prev(nullptr) {};
+    DLL(int k, int v): key(k), value(v), freq(1), next(nullptr), prev(nullptr) {};
 };
 
-class LRUCache {
+class List {
     public:
-    int size;
     DLL* head;
     DLL* tail;
-    
-    LRUCache() {
+    int size;
+    List() {
         this->head = new DLL(0, 0);
         this->tail = new DLL(0, 0);
-        this->head->next = tail;
-        this->tail->prev = head;
-        size = 0;
+        this->head->next = this->tail;
+        this->tail->prev = this->head;
+        this->size = 0;
     }
 
-    void addToTail(DLL* node) {
+    void remove(DLL* node) {
+        DLL* delPrev = node->prev;
+        DLL* delNext = node->next;
+        delPrev->next = delNext;
+        delNext->prev = delPrev;  
+        this->size--;      
+    }
+
+    void addNode(DLL* node) {
         DLL* temp = head->next;
         node->next = temp;
         node->prev = head;
@@ -30,90 +36,73 @@ class LRUCache {
         this->size++;
     }
 
-     void removeNode(DLL* node) {
-        DLL* delPrev = node->prev;
-        DLL* delNext = node->next;
-        delPrev->next = delNext;
-        delNext->prev = delPrev;
-        this->size--;
-    }
 };
 
 class LFUCache {
 public:
-    int miniFreq, capacity, currSize;
-    unordered_map<int, DLL*> keyNodeMap;
-    unordered_map<int, LRUCache*> freqListMap;
 
-    void updateFreqList(DLL* node) {
-        keyNodeMap.erase(node->key);
-        freqListMap[node->freq]->removeNode(node);
-
-        if(node->freq == this->miniFreq && freqListMap[node->freq]->size == 0) {
-            this->miniFreq++;
-        }
-
-        LRUCache* nextHigherFreq = new LRUCache();
-        if(freqListMap.count(node->freq + 1)) {
-            nextHigherFreq = freqListMap[node->freq+1];
-        }
-
-        node->freq += 1;
-        nextHigherFreq->addToTail(node); 
-        freqListMap[node->freq] = nextHigherFreq;
-        keyNodeMap[node->key] = node;
-    }
-
+    int capacity, miniFreq, currSize;
+    unordered_map<int, DLL*> keyNodeHashMap;
+    unordered_map<int, List*> freqHashMap; 
 
     LFUCache(int c) {
-        miniFreq = 0;
-        currSize = 0;
-        capacity = c;
+        this->capacity = c;
+        this->miniFreq = 1;
+        this->currSize = 0;
     }
     
+    void updateFreqMap(DLL* node) {
+        keyNodeHashMap.erase(node->key);
+        freqHashMap[node->freq]->remove(node);
 
+        if(this->miniFreq == node->freq && freqHashMap[node->freq]->size == 0) {
+            this->miniFreq++;
+        }
+        List* freqList;
+        if(freqHashMap.count(node->freq+1)) freqList = freqHashMap[node->freq + 1];
+        else freqList = new List();
+
+        node->freq += 1;
+        freqList->addNode(node);
+        freqHashMap[node->freq] = freqList;
+        keyNodeHashMap[node->key] = node;
+    }
 
     int get(int key) {
-        if(keyNodeMap.count(key)) {
-            DLL* node = keyNodeMap[key];
-            int val = node->value;
-            updateFreqList(node);
-            return val;
-        }
-
-        return -1;
+        if(!keyNodeHashMap.count(key)) return -1;
+        DLL* node = keyNodeHashMap[key];
+        int value = node->value;
+        updateFreqMap(node);
+        return value;
     }
     
     void put(int key, int value) {
-        if(keyNodeMap.count(key)) {
-            DLL* node = keyNodeMap[key];
+        if(this->capacity == 0) return;
+        if(keyNodeHashMap.count(key)) {
+            DLL* node = keyNodeHashMap[key];
             node->value = value;
-            updateFreqList(node);
+            updateFreqMap(node);
+            return;
         }
-        else {
-            if(currSize == capacity) {
-                LRUCache* list = freqListMap[this->miniFreq];
-                keyNodeMap.erase(list->tail->prev->key);
-                list->removeNode(list->tail->prev);
-                currSize--;
-            }
-            currSize++;
-            this->miniFreq = 1;
-            DLL* node = new DLL(value, key);
-            LRUCache* list = new LRUCache();
-            if(freqListMap.count(this->miniFreq)) {
-                list = freqListMap[this->miniFreq];
-            }
-            list->addToTail(node);
-            keyNodeMap[key] = node;
-            freqListMap[this->miniFreq] = list;
+
+        if(this->capacity == this->currSize) {
+            List* freqList = freqHashMap[miniFreq];
+            keyNodeHashMap.erase(freqList->tail->prev->key);
+            DLL* node = freqList->tail->prev;
+            freqList->remove(node);
+            this->currSize--;
         }
+        this->currSize++;
+
+        DLL* node = new DLL(key, value);
+        this->miniFreq = 1;
+
+        List* freqList;
+        if(freqHashMap.count(miniFreq)) freqList = freqHashMap[miniFreq];
+        else freqList = new List();
+
+        freqList->addNode(node);
+        freqHashMap[miniFreq] = freqList;
+        keyNodeHashMap[key] = node;
     }
 };
-
-/**
- * Your LFUCache object will be instantiated and called as such:
- * LFUCache* obj = new LFUCache(capacity);
- * int param_1 = obj->get(key);
- * obj->put(key,value);
- */
